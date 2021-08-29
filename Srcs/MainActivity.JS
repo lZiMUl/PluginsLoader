@@ -1,39 +1,46 @@
 class MainActivity {
 	constructor (Socket, CallBack) {
-		const Import = require ('modules-import');
+		if (!Socket ['PluginsStatus'])
+		return null;
 
-		new Import (new Array ('fs', 'path'));
-
-		const LWPC = FilePath => FilePath ['replace'] (new RegExp ('/', 'img'), Path ['sep'] === '\\'? '\\\\': '/');
-		const Root = LWPC (Path ['join'] (Path ['dirname'] (__dirname), '../../', './Plugins/'));
-		const PluginsList = new Object;
-
+		this ['Socket'] = Socket;
+		this ['PluginsCore'] = new Object;
+		this ['PluginsName'] = new Array;
+		this ['PluginsMain'] = new Object;
+		const Root = Socket ['LWPC'] (Socket ['ModulesList'] ['Path'] ['join'] (Socket ['ModulesList'] ['Path'] ['dirname'] (__dirname), '../../', './Plugins/'));
 		if (Object ['prototype'] ['toString'] ['call'] (Socket) === '[object Object]')
-		Fs ['exists'] (Root, Status => {
+		Socket ['ModulesList'] ['Fs'] ['exists'] (Root, Status => {
 			if (!Status) 
-			Fs ['mkdir'] (Root, Status => null);
-			Fs ['readdir'] (Root, (Status, Results) => {
+			Socket ['ModulesList'] ['Fs'] ['mkdir'] (Root, Status => null);
+			Socket ['ModulesList'] ['Fs'] ['readdir'] (Root, (Status, Results) => {
+				Socket ['SendMTM'] = (PluginName, Message) => {
+					if (this ['PluginsName'] ['indexOf'] (PluginName) !== -1 && Message) Socket ['SendMTMS'] (`§l§o§9Plugin §l§o§a${PluginName} §e=> §f${Message}`);
+				};
 				if (Status === null && Results ['length'] !== 0)
 				Results ['forEach'] ((Result, Index) => {
-					const ManifestPath = LWPC (Path ['join'] (Root, Result, 'Manifest.JSON'));
-					Fs ['exists'] (ManifestPath, Status => {
+					const Path = Socket ['LWPC'] (Socket ['ModulesList'] ['Path'] ['join'] (Root, Result, 'Manifest.JSON'));
+					Socket ['ModulesList'] ['Fs'] ['exists'] (Path, Status => {
 						if (Status) {
-							Fs ['readFile'] (ManifestPath, 'UTF-8', (Status, Data) => {
+							Socket ['ModulesList'] ['Fs'] ['readFile'] (Path, 'UTF-8', (Status, Data) => {
 								if (Status === null && this ['IsJson'] (Data)) {
 									const ParseData = JSON ['parse'] (Data);
 									if (this ['IsContentLegitimate'] ('Name', 'String', ParseData) && this ['IsContentLegitimate'] ('Description', 'String', ParseData)  && this ['IsContentLegitimate'] ('Author', 'String', ParseData)  && this ['IsContentLegitimate'] ('Main', 'String', ParseData) && this ['IsContentLegitimate'] ('Version', 'String', ParseData)) {
-										const MainPath = LWPC (Path ['join'] (Root, Result, ParseData ['Main']));
-										Fs ['exists'] (MainPath, Status => {
+										const Path = Socket ['LWPC'] (Socket ['ModulesList'] ['Path'] ['join'] (Root, Result, ParseData ['Main']));
+										Socket ['ModulesList'] ['Fs'] ['exists'] (Path, Status => {
 											if (Status)
 											try {
-												Fs ['readFile'] (MainPath, 'UTF-8', (Status, Data) => {
+												Socket ['ModulesList'] ['Fs'] ['readFile'] (Path, 'UTF-8', (Status, Data) => {
 													if (Status === null) {
-														if (const Repeat (PluginsList) ['indexOf'] (ParseData ['Name']) === -1) {
-															PluginsList [ParseData ['Name']] = new (eval (`(${Data})`)) (Socket);
-															PluginsList [ParseData ['Name']] ['Manifest'] = ParseData;
-															console ['info'] (`[${Result}] => 載入成功`);
+														if (this ['Repeat'] (this ['PluginsCore']) ['indexOf'] (ParseData ['Name']) === -1) {
+															Socket ['Input'] = Func => this ['PluginsMain'] [ParseData ['Name']] = Func;
+															Socket ['SendCMD'] ('Tellraw @a {"rawtext": [{"text": "--------------"}]}');
+															Socket ['SendMTMS'] (`§l§o§9PluginStatus §l§o§9[§f${Result}§9] §e=> §a載入成功`);
+															Socket ['SendMTMS'] (`§l§o§9PluginInfo §e=> §9[§a${ParseData ['Name'] ['length'] > 15? ParseData ['Name'] ['substring'] (0, 15): ParseData ['Name']}§f@§d${ParseData ['Version'] ['length'] > 9? ParseData ['Version'] ['substring'] (0, 9): ParseData ['Version']}§f#§c${ParseData ['Author'] ['length'] > 10? ParseData ['Author'] ['substring'] (0, 10): ParseData ['Author']}§f#§e${ParseData ['Description'] ['length'] > 12? ParseData ['Description'] ['substring'] (0, 12): ParseData ['Description']}§9]`);
+															this ['PluginsName'] ['push'] (ParseData ['Name']);
+															this ['PluginsCore'] [ParseData ['Name']] = new (eval (`(${Data})`)) (Socket);
+															this ['PluginsCore'] [ParseData ['Name']] ['Manifest'] = this ['ParseData'];
 														} else
-														console ['error'] (`[${Result}] => 載入失敗 重複包名`);
+														Socket ['SendMTMS'] (`§l§o§9PluginStatus §l§o§9[§f${Result}§9] §e=> §4載入失敗 重複包名`);
 														}
 												})
 											} catch (Err) {}
@@ -43,10 +50,10 @@ class MainActivity {
 							})
 						}
 					});
-					if (Index === Results.length - 1)
+					if (Index === Results ['length'] - 1)
 					setTimeout(Event => {
 						if (Object ['prototype'] ['toString'] ['call'] (CallBack) === '[object Function]') 
-						CallBack (PluginsList);
+						CallBack (this ['PluginsName']);
 						}, 1000)
 				});
 			})
@@ -76,8 +83,15 @@ class MainActivity {
 		Result ['push'] (Value);
 		return Result;
 	}
+	
+	Submit (Data) {
+		if (this ['PluginsName'] ['indexOf'] (Data [0]) === -1) {
+			this ['Socket'] ['SendMTMS'] ('§l§o§9PluginStatus §l§o§4該擴展插件不存在');
+		} else {
+			if (Object ['prototype'] ['toString'] ['call'] (this ['PluginsMain'] [Data [0]]) === '[object Function]')
+			this ['PluginsMain'] [Data [0]] (Data);
+		}
+	}
 }
 
 module ['exports'] = MainActivity;
-
-new MainActivity
